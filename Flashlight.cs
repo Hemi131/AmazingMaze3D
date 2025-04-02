@@ -24,21 +24,6 @@ namespace AmazingMaze3D
             direction = Vector3.UnitZ;
         }
 
-        public static Quaternion FromEulerAngles(float pitch, float yaw)
-        {
-            // Convert degrees to radians
-            float pitchRad = MathHelper.DegreesToRadians(pitch);
-            float yawRad = MathHelper.DegreesToRadians(yaw);
-
-            // Calculate the quaternion for each axis rotation
-            Quaternion qPitch = Quaternion.FromAxisAngle(Vector3.UnitX, pitchRad);
-            Quaternion qYaw = Quaternion.FromAxisAngle(Vector3.UnitY, yawRad);
-
-            // Combine the quaternions
-            Quaternion result = qYaw * qPitch;
-            return result;
-        }
-
         public void UpdatePositionAndDirection(Camera camera)
         {
             Vector3 posVec3 = new Vector3(camera.pos.X, 2.05f, camera.pos.Z);

@@ -18,10 +18,22 @@ namespace AmazingMaze3D
         public float speed = 1.4f;
         public float sensitivity = 1;
 
+        float peek = 0.2f;
+
+        Vector2 vec1;
+        Vector2 vec2;
+        Vector2 vec3;
+        Vector2 vec4;
+
         public Viewport viewport;
         public Camera(Viewport viewport)
         {
             this.viewport = viewport;
+
+            vec1 = new Vector2(-1f, -1f) * peek;
+            vec2 = new Vector2(1f, -1f) * peek;
+            vec3 = new Vector2(-1f, 1f) * peek;
+            vec4 = new Vector2(1f, 1f) * peek;
         }
 
         public virtual Matrix4 Projection
@@ -49,53 +61,33 @@ namespace AmazingMaze3D
             float potX = pos.X + deltaX;
             float potZ = pos.Z + deltaZ;
 
-            //Vector2 dia1 = new Vector2(deltaX, deltaZ);
-            //Vector2 dia2 = new Vector2(deltaX, deltaZ);
+            int x1 = (int)((potX + 1f + vec1.X) / 2f);
+            int z1 = (int)((potZ + 1f + vec1.Y) / 2f);
+            int x2 = (int)((potX + 1f + vec2.X) / 2f);
+            int z2 = (int)((potZ + 1f + vec2.Y) / 2f);
+            int x3 = (int)((potX + 1f + vec3.X) / 2f);
+            int z3 = (int)((potZ + 1f + vec3.Y) / 2f);
+            int x4 = (int)((potX + 1f + vec4.X) / 2f);
+            int z4 = (int)((potZ + 1f + vec4.Y) / 2f);
 
-            //double angle = Math.PI / 4;
-            //Matrix2 rot1 = new Matrix2((float)Math.Cos(angle), (float)Math.Sin(angle), -(float)Math.Sin(angle), (float)Math.Cos(angle));
-            //Matrix2 rot2 = new Matrix2((float)Math.Cos(-angle), (float)Math.Sin(-angle), -(float)Math.Sin(-angle), (float)Math.Cos(-angle));
+            int xn1 = (int)((pos.X + 1f + vec1.X) / 2f);
+            int zn1 = (int)((pos.Z + 1f + vec1.Y) / 2f);
+            int xn2 = (int)((pos.X + 1f + vec2.X) / 2f);
+            int zn2 = (int)((pos.Z + 1f + vec2.Y) / 2f);
+            int xn3 = (int)((pos.X + 1f + vec3.X) / 2f);
+            int zn3 = (int)((pos.Z + 1f + vec3.Y) / 2f);
+            int xn4 = (int)((pos.X + 1f + vec4.X) / 2f);
+            int zn4 = (int)((pos.Z + 1f + vec4.Y) / 2f);
 
-            //dia1 = rot1 * dia1;
-            //dia2 = rot2 * dia2;
+            if (!wallHere[x1 + 1, zn1 + 1] && !wallHere[x2 + 1, zn2 + 1] && !wallHere[x3 + 1, zn3 + 1] && !wallHere[x4 + 1, zn4 + 1]) pos.X = potX;
+            if (!wallHere[xn1 + 1, z1 + 1] && !wallHere[xn2 + 1, z2 + 1] && !wallHere[xn3 + 1, z3 + 1] && !wallHere[xn4 + 1, z4 + 1]) pos.Z = potZ;
 
-
-            float peek = 0.2f;
-
-            int x1 = (int)((potX + 1f + peek) / 2f) + 1;
-            int z1 = (int)((potZ + 1f + peek) / 2f);
-            int x2 = (int)((potX + 1f - peek) / 2f) + 1;
-            int z2 = (int)((potZ + 1f - peek) / 2f);
-            //int x3 = (int)((pos.X + dia1.X + 1f + peek * 4) / 2f) + 1;
-            //int z3 = (int)((pos.Z + dia1.Y + 1f + peek * 4) / 2f);
-            //int x4 = (int)((pos.X + dia2.X + 1f + peek * 4) / 2f) + 1;
-            //int z4 = (int)((pos.Z + dia2.Y + 1f + peek * 4) / 2f);
-
-
-            if (!wallHere[x1,z1] && !wallHere[x2, z2] && !wallHere[x1, z2] && !wallHere[x2, z1]/* && !wallHere[x3, z3] && !wallHere[x4, z3]*/)
-            {
-                pos.X = potX;
-                pos.Z = potZ;
-            }
-            else
-            {
-                Vector2 vec1 = new Vector2(deltaX, 0f);
-                Vector2 vec2 = new Vector2(0f, deltaZ);
-                vec1.Normalize();
-                vec2.Normalize();
-                vec1 *= peek;
-                vec2 *= peek;
-
-                if (!wallHere[(int)((potX + 1f + vec1.X) / 2f) + 1, (int)((potZ + 1f) / 2f)]) pos.X = potX;
-                if (!wallHere[(int)((potX + 1f) / 2f) + 1, (int)((potZ + 1f + vec2.Y) / 2f)]) pos.Z = potZ;
-
-            }
 
             //for (int i = 0; i < 17 + 2; i++)
             //{
             //    for (int j = 0; j < 24 + 2; j++)
             //    {
-            //        if ((x2 == j) && (z2 == i)) { Console.Write("O"); }
+            //        if ((x1+1 == j) && (z1+1 == i)) { Console.Write("O"); }
             //        else if (wallHere[j, i]) { Console.Write("X"); }
             //        else { Console.Write(" "); }
             //    }

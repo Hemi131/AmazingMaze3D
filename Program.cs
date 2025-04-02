@@ -160,11 +160,12 @@ public class Program : GameWindow
         float blockDepth = 2.0f;
 
         char curr;
-        for (int y = 1; y < lines.Length; y++)
+        for (int y = 0; y < lines.Length - 1; y++)
         {
-            for (int x = 0; x < lines[y].Length; x++)
+            for (int x = 0; x < lines[y + 1].Length; x++)
             {
-                curr = lines[y][x];
+                curr = lines[y + 1][x];
+
                 Model block;
                 switch (curr)
                 {
@@ -174,7 +175,7 @@ public class Program : GameWindow
                         new Vector3(0.8f),
                         32.0f);
 
-                        wallHere[x+1, y] = true;
+                        wallHere[x + 1, y + 1] = true;
                         modelList.Add(block);
                         break;
                     case ' ':
