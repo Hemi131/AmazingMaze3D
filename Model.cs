@@ -31,12 +31,13 @@ namespace AmazingMaze3D
 
         int triangles;
 
-        public Model(Vector3 pos, string objFileName, Shader shader, Vector3 diff, Vector3 spec, float shin)
+        public Model(Vector3 pos, SimpleObj objFile, Shader shader, Vector3 diff, Vector3 spec, float shin)
         {
             Material = new Material(diff, spec, shin);
             position = pos;
             Shader = shader;
-            (Vertex[] vertices, int[] indices) = SimpleObj.LoadObj(objFileName);
+            Vertex[] vertices = objFile.verticecs;
+            int[] indices = objFile.indices;
             triangles = indices.Length / 3;
 
             // vytvoření a připojení VAO

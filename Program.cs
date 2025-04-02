@@ -132,6 +132,9 @@ public class Program : GameWindow
     }
     private void loadModels()
     {
+        SimpleObj wall1 = SimpleObj.LoadObj("wall1.obj");
+        SimpleObj freeSpace = SimpleObj.LoadObj("freeSpace.obj");
+
         string[] lines = File.ReadAllLines("map1.txt");
 
         string[] rozmery = lines[0].Split("x");
@@ -166,7 +169,7 @@ public class Program : GameWindow
                 switch (curr)
                 {
                     case 'x':
-                        block = new Model(new Vector3(x * blockWidth, 0, y * blockDepth), "wall1.obj", shader,
+                        block = new Model(new Vector3(x * blockWidth, 0, y * blockDepth), wall1, shader,
                         new Vector3(0.01f, 0.1f, 0.8f),
                         new Vector3(0.8f),
                         32.0f);
@@ -175,7 +178,7 @@ public class Program : GameWindow
                         modelList.Add(block);
                         break;
                     case ' ':
-                        block = new Model(new Vector3(x * blockWidth, 0, y * blockDepth), "freeSpace.obj", shader,
+                        block = new Model(new Vector3(x * blockWidth, 0, y * blockDepth), freeSpace, shader,
                         new Vector3(0.01f, 0.8f, 0.01f),
                         new Vector3(0.8f),
                         32.0f);
@@ -186,7 +189,7 @@ public class Program : GameWindow
                     case '@':
                         mainCamera.pos = new Vector3(x * blockWidth, 1.7f, y * blockDepth);
 
-                        block = new Model(new Vector3(x * blockWidth, 0, y * blockDepth), "freeSpace.obj", shader,
+                        block = new Model(new Vector3(x * blockWidth, 0, y * blockDepth), freeSpace, shader,
                         new Vector3(0.01f, 0.8f, 0.01f),
                         new Vector3(0.8f),
                         32.0f);
@@ -195,7 +198,7 @@ public class Program : GameWindow
                         break;
 
                     default:
-                        block = new Model(new Vector3(x * blockWidth, 0, y * blockDepth), "freeSpace.obj", shader,
+                        block = new Model(new Vector3(x * blockWidth, 0, y * blockDepth), freeSpace, shader,
                         new Vector3(0.01f, 0.8f, 0.01f),
                         new Vector3(0.8f),
                         32.0f);

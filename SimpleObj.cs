@@ -11,7 +11,13 @@ namespace AmazingMaze3D
 {
     public class SimpleObj
     {
-        public static (Vertex[] verticecs, int[] indices) LoadObj(string filename)
+        public Vertex[] verticecs;
+        public int[] indices;
+        public SimpleObj(Vertex[] verticecs, int[] indices) {
+            this.verticecs = verticecs;
+            this.indices = indices;
+        }
+        public static SimpleObj LoadObj(string filename)
         {
             string[] lines = File.ReadAllLines(filename);
             int cnt = 0;
@@ -45,7 +51,7 @@ namespace AmazingMaze3D
 
             SimpleNormals(vertices, indices);
 
-                return (vertices, indices);
+                return new SimpleObj(vertices, indices);
         }
 
         private static void SimpleNormals(Vertex[] vertices, int[] indices)
