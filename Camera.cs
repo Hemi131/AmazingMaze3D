@@ -79,15 +79,15 @@ namespace AmazingMaze3D
             int xn4 = (int)((pos.X + 1f + vec4.X) / 2f);
             int zn4 = (int)((pos.Z + 1f + vec4.Y) / 2f);
 
-            if (!wallHere[x1 + 1, zn1 + 1] && !wallHere[x2 + 1, zn2 + 1] && !wallHere[x3 + 1, zn3 + 1] && !wallHere[x4 + 1, zn4 + 1]) pos.X = potX;
-            if (!wallHere[xn1 + 1, z1 + 1] && !wallHere[xn2 + 1, z2 + 1] && !wallHere[xn3 + 1, z3 + 1] && !wallHere[xn4 + 1, z4 + 1]) pos.Z = potZ;
+            if (!wallHere[x1, zn1] && !wallHere[x2, zn2] && !wallHere[x3, zn3] && !wallHere[x4, zn4]) pos.X = potX;
+            if (!wallHere[xn1, z1] && !wallHere[xn2, z2] && !wallHere[xn3, z3] && !wallHere[xn4, z4]) pos.Z = potZ;
 
-
-            //for (int i = 0; i < 17 + 2; i++)
+            //Console.WriteLine($"pos: {pos.X}, {pos.Y}, {pos.Z}");
+            //for (int i = 0; i < 15 + 2; i++)
             //{
-            //    for (int j = 0; j < 24 + 2; j++)
+            //    for (int j = 0; j < 15 + 2; j++)
             //    {
-            //        if ((x1+1 == j) && (z1+1 == i)) { Console.Write("O"); }
+            //        if (((int)((pos.X + 1f) / 2f) == j) && ((int)((pos.Z + 1f) / 2f) == i)) { Console.Write("O"); }
             //        else if (wallHere[j, i]) { Console.Write("X"); }
             //        else { Console.Write(" "); }
             //    }

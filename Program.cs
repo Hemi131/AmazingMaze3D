@@ -8,8 +8,10 @@ namespace AmazingMaze3D;
 
 public class Program : GameWindow
 {
-    public static void Main() => new Program().Run();
+    public static void Main(string[] args) => new Program(args).Run();
 
+    string[] args;
+    string mapName = "map1.txt";
     Viewport mainViewport;
     Camera mainCamera;
     Light light;
@@ -23,7 +25,7 @@ public class Program : GameWindow
     int fps = 0;
 
 
-    public Program() : base(GameWindowSettings.Default, new NativeWindowSettings() { ClientSize=new OpenTK.Mathematics.Vector2i(600,600) }) { }
+    public Program(string[] args) : base(GameWindowSettings.Default, new NativeWindowSettings() { ClientSize=new OpenTK.Mathematics.Vector2i(600,600) }) { this.args = args; }
 
     protected override void OnLoad()
     {
@@ -52,6 +54,10 @@ public class Program : GameWindow
         flashlight = new Flashlight();
 
         WindowState = WindowState.Fullscreen;
+
+        if (args.Length > 0) {
+            mapName = args[0];
+        }
         loadModels();
     }
 
@@ -135,7 +141,8 @@ public class Program : GameWindow
         SimpleObj wall1 = SimpleObj.LoadObj("wall1.obj");
         SimpleObj freeSpace = SimpleObj.LoadObj("freeSpace.obj");
 
-        string[] lines = File.ReadAllLines("map1.txt");
+        Console.WriteLine("Loading map: " + mapName);
+        string[] lines = File.ReadAllLines(mapName);
 
         string[] rozmery = lines[0].Split("x");
         int rozmer1 = int.Parse(rozmery[0]);
@@ -160,11 +167,11 @@ public class Program : GameWindow
         float blockDepth = 2.0f;
 
         char curr;
-        for (int y = 0; y < lines.Length - 1; y++)
+        for (int y = 1; y < lines.Length; y++)
         {
-            for (int x = 0; x < lines[y + 1].Length; x++)
+            for (int x = 1; x < lines[y].Length; x++)
             {
-                curr = lines[y + 1][x];
+                curr = lines[y][x - 1];
 
                 Model block;
                 switch (curr)
@@ -175,7 +182,7 @@ public class Program : GameWindow
                         new Vector3(0.8f),
                         32.0f);
 
-                        wallHere[x + 1, y + 1] = true;
+                        wallHere[x, y] = true;
                         modelList.Add(block);
                         break;
                     case ' ':

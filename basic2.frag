@@ -47,8 +47,8 @@ vec3 calculateFlashlight(vec3 norm, vec3 viewDir) {
     
     float theta = dot(-flashlightToFrag, normalize(flashlightDirWorld));
 
-    float cutOff = cos(radians(25.0));
-    float outerCutOff = cos(radians(35.0));
+    float cutOff = cos(radians(20.0));
+    float outerCutOff = cos(radians(30.0));
     float intensity = smoothstep(outerCutOff, cutOff, theta) * 0.8;
 
     // Attenuation based on distance
