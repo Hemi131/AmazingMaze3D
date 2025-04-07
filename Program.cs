@@ -169,7 +169,7 @@ public class Program : GameWindow
         char curr;
         for (int y = 1; y < lines.Length; y++)
         {
-            for (int x = 1; x < lines[y].Length; x++)
+            for (int x = 1; x < lines[y].Length + 1; x++)
             {
                 curr = lines[y][x - 1];
 
