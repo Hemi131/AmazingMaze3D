@@ -23,7 +23,9 @@ namespace AmazingMaze3D
 
         public Material Material { get; set; }            
 
-        public Vector3 position;
+        public Vector3 Position { get; set; }
+
+        public Texture Texture { get; set; }
 
         int vbo;       
         int ibo;
@@ -31,13 +33,28 @@ namespace AmazingMaze3D
 
         int triangles;
 
-        public Model(Vector3 pos, SimpleObj objFile, Shader shader, Vector3 diff, Vector3 spec, float shin)
+        public Model() {}
+        public Model(Vertex[] vertices, int[] indices, Vector3 position, Shader shader, Material material, Texture texture)
         {
-            Material = new Material(diff, spec, shin);
-            position = pos;
+            Position = position;
             Shader = shader;
-            Vertex[] vertices = objFile.verticecs;
-            int[] indices = objFile.indices;
+            Material = material;
+            Texture = texture;
+            Create(vertices, indices);
+        }
+
+        public Model(string objFilename, Vector3 position, Shader shader, Material material, Texture texture)
+        {
+            Position = position;
+            Shader = shader;
+            Material = material;
+            Texture = texture;
+            (Vertex[] vertices, int[] indices) = BetterObj.LoadObj(objFilename);
+            Create(vertices, indices);
+        }
+
+        protected void Create(Vertex[] vertices, int[] indices)
+        {
             triangles = indices.Length / 3;
 
             // vytvoření a připojení VAO
@@ -46,7 +63,7 @@ namespace AmazingMaze3D
 
             // Vytvoření a připojení VBO
             vbo = GL.GenBuffer();
-            
+
             GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
             GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * Vertex.SizeOf(), vertices, BufferUsageHint.StaticDraw);
 
@@ -59,19 +76,19 @@ namespace AmazingMaze3D
             // namapování pointerů na lokace v shaderu
             GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, Vertex.SizeOf(), IntPtr.Zero);
             GL.EnableVertexAttribArray(0);
-            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, Vertex.SizeOf(), (IntPtr)3*sizeof(float));
+            GL.VertexAttribPointer(1, 3, VertexAttribPointerType.Float, false, Vertex.SizeOf(), (IntPtr)3 * sizeof(float));
+            GL.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, Vertex.SizeOf(), (IntPtr)6 * sizeof(float));
             GL.EnableVertexAttribArray(1);
-
+            GL.EnableVertexAttribArray(2);
             GL.BindVertexArray(0);
         }
-
 
         /// <summary>
         /// Vykreslení modelu
         /// </summary>
-        public void Draw(Camera camera, Flashlight flashlight, Light light)
+        public void Draw(Camera camera, Flashlight flashlight, Light light, bool wireModel)
         {
-            Matrix4 translate = Matrix4.CreateTranslation((float)position.X, (float)position.Y, (float)position.Z);
+            Matrix4 translate = Matrix4.CreateTranslation((float)Position.X, (float)Position.Y, (float)Position.Z);
 
             Shader.Use();
             Shader.SetUniform("projection", camera.Projection);
@@ -91,12 +108,14 @@ namespace AmazingMaze3D
 
             Material.SetUniforms(Shader);
 
+            Texture.Bind(Shader.GetUniformLocation("objTex"));
+
             // Připojení bufferu
             GL.BindVertexArray(vao);
 
             //GL.Enable(EnableCap.CullFace);
             //GL.LineWidth(5);
-            GL.PolygonMode(TriangleFace.FrontAndBack, PolygonMode.Fill);
+            GL.PolygonMode(TriangleFace.FrontAndBack, wireModel ? PolygonMode.Line : PolygonMode.Fill);
 
             // Vykreslení pole vrcholů
             GL.DrawElements(PrimitiveType.Triangles, 3*triangles, DrawElementsType.UnsignedInt, IntPtr.Zero);

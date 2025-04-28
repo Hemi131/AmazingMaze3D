@@ -24,6 +24,8 @@ public class Program : GameWindow
     float lastFPStime = 0f;
     int fps = 0;
 
+    bool wireModel = false;
+
 
     public Program(string[] args) : base(GameWindowSettings.Default, new NativeWindowSettings() { ClientSize=new OpenTK.Mathematics.Vector2i(600,600) }) { this.args = args; }
 
@@ -48,7 +50,7 @@ public class Program : GameWindow
         };
 
         modelList = new List<Model>();
-        shader = new Shader("basic.vert", "basic2.frag");
+        shader = new Shader("shaders/basic.vert", "shaders/basic2.frag");
         mainCamera = new Camera(mainViewport);
         light = new Light(new Vector3(25, -1, 25), 0f, new Vector3(0.2f, 0.1f, 0.1f));
         flashlight = new Flashlight();
@@ -79,7 +81,7 @@ public class Program : GameWindow
 
         foreach (var model in modelList)
         {
-            model.Draw(mainCamera, flashlight, light);
+            model.Draw(mainCamera, flashlight, light, wireModel);
         }
 
         SwapBuffers();
@@ -99,6 +101,7 @@ public class Program : GameWindow
         if (KeyboardState.IsKeyDown(Keys.LeftShift)) running = 2;
         if (KeyboardState.IsKeyDown(Keys.F) && lastToggle <= 0f) { flashlight.Toggle(); lastToggle = 0.2f; }
         if (KeyboardState.IsKeyDown(Keys.F11) && lastToggle <= 0f) { WindowState = WindowState == WindowState.Fullscreen ? WindowState.Maximized : WindowState.Fullscreen; lastToggle = 0.2f; }
+        if (KeyboardState.IsKeyDown(Keys.F10) && lastToggle <= 0f) { wireModel = !wireModel; lastToggle = 0.2f; }
 
         if (KeyboardState.IsKeyDown(Keys.Escape)) Close();
 
@@ -138,11 +141,10 @@ public class Program : GameWindow
     }
     private void loadModels()
     {
-        SimpleObj wall1 = SimpleObj.LoadObj("wall1.obj");
-        SimpleObj freeSpace = SimpleObj.LoadObj("freeSpace.obj");
+        MyObjects myObjects = new MyObjects(shader);
 
         Console.WriteLine("Loading map: " + mapName);
-        string[] lines = File.ReadAllLines(mapName);
+        string[] lines = File.ReadAllLines("maps/" + mapName);
 
         string[] rozmery = lines[0].Split("x");
         int rozmer1 = int.Parse(rozmery[0]);
@@ -173,45 +175,41 @@ public class Program : GameWindow
             {
                 curr = lines[y][x - 1];
 
-                Model block;
+                Vector3 blockPos = new Vector3(x * blockWidth, 0, y * blockDepth);
                 switch (curr)
                 {
                     case 'x':
-                        block = new Model(new Vector3(x * blockWidth, 0, y * blockDepth), wall1, shader,
-                        new Vector3(0.01f, 0.1f, 0.8f),
-                        new Vector3(0.8f),
-                        32.0f);
-
                         wallHere[x, y] = true;
-                        modelList.Add(block);
+
+                        modelList.Add(myObjects.getWall1(blockPos));
+                        break;
+                    case 'y':
+                        wallHere[x, y] = true;
+                        modelList.Add(myObjects.getWall1Blood(blockPos));
                         break;
                     case ' ':
-                        block = new Model(new Vector3(x * blockWidth, 0, y * blockDepth), freeSpace, shader,
-                        new Vector3(0.01f, 0.8f, 0.01f),
-                        new Vector3(0.8f),
-                        32.0f);
-
-                        modelList.Add(block);
+                        modelList.Add(myObjects.getFreeSpaceTop1(blockPos));
+                        modelList.Add(myObjects.getFreeSpaceBottom1(blockPos));
                         break;
 
                     case '@':
                         mainCamera.pos = new Vector3(x * blockWidth, 1.7f, y * blockDepth);
 
-                        block = new Model(new Vector3(x * blockWidth, 0, y * blockDepth), freeSpace, shader,
-                        new Vector3(0.01f, 0.8f, 0.01f),
-                        new Vector3(0.8f),
-                        32.0f);
-
-                        modelList.Add(block);
+                        modelList.Add(myObjects.getFreeSpaceTop1(blockPos));
+                        modelList.Add(myObjects.getFreeSpaceBottom1(blockPos));
+                        break;
+                    case 's':
+                        wallHere[x, y] = true;
+                        modelList.Add(myObjects.getWallPic1L(blockPos));
+                        break;
+                    case 't':
+                        wallHere[x, y] = true;
+                        modelList.Add(myObjects.getWallPic1R(blockPos));
                         break;
 
                     default:
-                        block = new Model(new Vector3(x * blockWidth, 0, y * blockDepth), freeSpace, shader,
-                        new Vector3(0.01f, 0.8f, 0.01f),
-                        new Vector3(0.8f),
-                        32.0f);
-
-                        modelList.Add(block);
+                        modelList.Add(myObjects.getFreeSpaceTop1(blockPos));
+                        modelList.Add(myObjects.getFreeSpaceBottom1(blockPos));
                         break;
 
                 }
@@ -228,4 +226,25 @@ public class Program : GameWindow
         //}
     }
 
+    private static HashSet<string> _extensions;
+
+    public static bool IsExtensionSupported(string extensionName)
+    {
+        if (_extensions == null)
+        {
+            _extensions = new HashSet<string>();
+            GL.GetInteger(GetPName.NumExtensions, out int extensionCount);
+
+            for (int i = 0; i < extensionCount; i++)
+            {
+                string ext = GL.GetString(StringNameIndexed.Extensions, i);
+                if (ext != null)
+                    _extensions.Add(ext);
+            }
+        }
+
+        return _extensions.Contains(extensionName);
+    }
+
 }
+

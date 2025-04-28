@@ -32,7 +32,7 @@ namespace AmazingMaze3D
                 float.TryParse(tokens[1], NumberStyles.Float, CultureInfo.InvariantCulture, out float x);
                 float.TryParse(tokens[2], NumberStyles.Float, CultureInfo.InvariantCulture, out float y);
                 float.TryParse(tokens[3], NumberStyles.Float, CultureInfo.InvariantCulture, out float z);
-                vertices[i] = new Vertex(new Vector3(x, y, z), Vector3.Zero);
+                //vertices[i] = new Vertex(new Vector3(x, y, z), Vector3.Zero);
             }
 
             int[] indices = new int[3 * (lines.Length - cnt)];
