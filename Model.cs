@@ -33,7 +33,6 @@ namespace AmazingMaze3D
 
         int triangles;
 
-        public Model() {}
         public Model(Vertex[] vertices, int[] indices, Vector3 position, Shader shader, Material material, Texture texture)
         {
             Position = position;
@@ -105,6 +104,8 @@ namespace AmazingMaze3D
             Shader.SetUniform("flashlightColor", flashlight.color);
             Shader.SetUniform("flashlightIntensity", flashlight.intensity);
             Shader.SetUniform("flashlightDirWorld", flashlight.direction);
+
+            Shader.SetUniform("lightOverdose", light.lightOverdose);
 
             Material.SetUniforms(Shader);
 

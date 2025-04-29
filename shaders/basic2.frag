@@ -19,6 +19,8 @@ uniform vec3 flashlightColor;
 uniform float flashlightIntensity;
 uniform vec3 flashlightDirWorld;
 
+uniform vec3 lightOverdose;
+
 uniform sampler2D objTex;
 
 in vec3 normalWorld;
@@ -78,6 +80,6 @@ void main() {
     vec3 directional = calculateDirectionalLight(norm, viewDir, texColor);
     vec3 flashlight = calculateFlashlight(norm, viewDir, texColor);
 
-    vec3 finalColor = ambient + directional + flashlight;
+    vec3 finalColor = ambient + directional + flashlight + lightOverdose;
     outColor = vec4(finalColor, 1.0);
 }

@@ -27,7 +27,7 @@ public class Program : GameWindow
     bool wireModel = false;
 
 
-    public Program(string[] args) : base(GameWindowSettings.Default, new NativeWindowSettings() { ClientSize=new OpenTK.Mathematics.Vector2i(600,600) }) { this.args = args; }
+    public Program(string[] args) : base(GameWindowSettings.Default, new NativeWindowSettings() { ClientSize=new OpenTK.Mathematics.Vector2i(600,600), DepthBits = 24 }) { this.args = args; }
 
     protected override void OnLoad()
     {
@@ -37,6 +37,7 @@ public class Program : GameWindow
         GL.Enable(EnableCap.DebugOutputSynchronous);
         GL.DebugMessageCallback(DebugCallback, IntPtr.Zero);
         GL.Enable(EnableCap.DepthTest);
+        GL.LineWidth(10);
 
         CursorState = CursorState.Grabbed;
 
@@ -52,7 +53,7 @@ public class Program : GameWindow
         modelList = new List<Model>();
         shader = new Shader("shaders/basic.vert", "shaders/basic2.frag");
         mainCamera = new Camera(mainViewport);
-        light = new Light(new Vector3(25, -1, 25), 0f, new Vector3(0.2f, 0.1f, 0.1f));
+        light = new Light(new Vector3(25, -1, 25), 0f, new Vector3(0.2f, 0.1f, 0.1f), new Vector3(0f));
         flashlight = new Flashlight();
 
         WindowState = WindowState.Fullscreen;
@@ -79,9 +80,39 @@ public class Program : GameWindow
     {
         GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-        foreach (var model in modelList)
+        if (wireModel)
         {
-            model.Draw(mainCamera, flashlight, light, wireModel);
+            var view = mainCamera.View;
+            var direction = new Vector3(view[0, 2], view[1, 2], view[2, 2]);
+
+            direction = direction / new Vector3(Math.Abs(direction.X), Math.Abs(direction.Y), Math.Abs(direction.X)) * 0.01f;
+
+            mainCamera.pos.X += direction.X;
+            mainCamera.pos.Z += direction.Z;
+            mainCamera.pos.Y += direction.Y;
+
+            foreach (var model in modelList)
+            {
+                model.Draw(mainCamera, flashlight, light, false);
+            }
+
+            GL.Clear(ClearBufferMask.ColorBufferBit);
+
+            mainCamera.pos.X -= direction.X;
+            mainCamera.pos.Z -= direction.Z;
+            mainCamera.pos.Y -= direction.Y;
+
+            foreach (var model in modelList)
+            {
+                model.Draw(mainCamera, flashlight, light, true);
+            }
+
+        } else {
+            foreach (var model in modelList)
+            {
+                model.Draw(mainCamera, flashlight, light, false);
+            }
+
         }
 
         SwapBuffers();
@@ -101,7 +132,7 @@ public class Program : GameWindow
         if (KeyboardState.IsKeyDown(Keys.LeftShift)) running = 2;
         if (KeyboardState.IsKeyDown(Keys.F) && lastToggle <= 0f) { flashlight.Toggle(); lastToggle = 0.2f; }
         if (KeyboardState.IsKeyDown(Keys.F11) && lastToggle <= 0f) { WindowState = WindowState == WindowState.Fullscreen ? WindowState.Maximized : WindowState.Fullscreen; lastToggle = 0.2f; }
-        if (KeyboardState.IsKeyDown(Keys.F10) && lastToggle <= 0f) { wireModel = !wireModel; lastToggle = 0.2f; }
+        if (KeyboardState.IsKeyDown(Keys.F10) && lastToggle <= 0f) { wireModel = !wireModel; lastToggle = 0.2f; if (light.lightOverdose.X > 0f) { light.lightOverdose = new Vector3(0f); } else { light.lightOverdose = new Vector3(1f); } }
 
         if (KeyboardState.IsKeyDown(Keys.Escape)) Close();
 
