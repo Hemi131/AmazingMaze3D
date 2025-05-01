@@ -26,6 +26,8 @@ public class Program : GameWindow
 
     bool wireModel = false;
 
+    Teleport teleport;
+
 
     public Program(string[] args) : base(GameWindowSettings.Default, new NativeWindowSettings() { ClientSize=new OpenTK.Mathematics.Vector2i(600,600), DepthBits = 24 }) { this.args = args; }
 
@@ -55,6 +57,7 @@ public class Program : GameWindow
         mainCamera = new Camera(mainViewport);
         light = new Light(new Vector3(25, -1, 25), 0f, new Vector3(0.2f, 0.1f, 0.1f), new Vector3(0f));
         flashlight = new Flashlight();
+        teleport = new Teleport("t", light, mainCamera);
 
         WindowState = WindowState.Fullscreen;
 
@@ -133,6 +136,7 @@ public class Program : GameWindow
         if (KeyboardState.IsKeyDown(Keys.F) && lastToggle <= 0f) { flashlight.Toggle(); lastToggle = 0.2f; }
         if (KeyboardState.IsKeyDown(Keys.F11) && lastToggle <= 0f) { WindowState = WindowState == WindowState.Fullscreen ? WindowState.Maximized : WindowState.Fullscreen; lastToggle = 0.2f; }
         if (KeyboardState.IsKeyDown(Keys.F10) && lastToggle <= 0f) { wireModel = !wireModel; lastToggle = 0.2f; if (light.lightOverdose.X > 0f) { light.lightOverdose = new Vector3(0f); } else { light.lightOverdose = new Vector3(1f); } }
+        if (KeyboardState.IsKeyDown(Keys.E)) { teleport.teleport(); }
 
         if (KeyboardState.IsKeyDown(Keys.Escape)) Close();
 
@@ -154,6 +158,7 @@ public class Program : GameWindow
         }
 
         flashlight.UpdatePositionAndDirection(mainCamera);
+        teleport.teleportAnimation((float)args.Time);
 
         fps++;
         lastFPStime += (float)args.Time;
@@ -236,6 +241,13 @@ public class Program : GameWindow
                     case 't':
                         wallHere[x, y] = true;
                         modelList.Add(myObjects.getWallPic1R(blockPos));
+                        break;
+                    case 'O':
+                        modelList.Add(myObjects.getFreeSpaceTop1(blockPos));
+                        modelList.Add(myObjects.getFloorTeleport(blockPos));
+
+                        teleport.setTeleportPos(new Vector3(x * blockWidth, 1.7f, y * blockDepth));
+
                         break;
 
                     default:

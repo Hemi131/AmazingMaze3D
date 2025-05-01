@@ -6,7 +6,7 @@ x T  A  x     x   A *  x
 x    x  x  *  x   x    x
 xxxAxx  x     x   xxxxxx
 x       A  H  A        x
-x       x  *  x        x
+x  O    x  *  x        x
 x  *    y     x        x
 x       xxxAxxx        x       
 x                      x
@@ -14,5 +14,5 @@ xxAxxx    xxAxx        x
 y    x    x * x   xxAxxx
 t    x    x T x   x    x
 s    x    xxxxx   x *T x
-x @  x            x    x      
+xO@  x            x    x      
 xxxxxxxxxxxxxxxxxxxxxxxx
