@@ -3,6 +3,7 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using System.Diagnostics;
 
 namespace AmazingMaze3D;
 
@@ -21,12 +22,14 @@ public class Program : GameWindow
     bool[,] wallHere;
 
     float lastToggle = 0f;
-    float lastFPStime = 0f;
     int fps = 0;
+    private List<double> frameTimes = new List<double>();
+    private Stopwatch stopwatch = new Stopwatch();
 
     bool wireModel = false;
 
     Teleport teleport;
+    Enemy enemy;
 
 
     public Program(string[] args) : base(GameWindowSettings.Default, new NativeWindowSettings() { ClientSize=new OpenTK.Mathematics.Vector2i(600,600), DepthBits = 24 }) { this.args = args; }
@@ -42,7 +45,7 @@ public class Program : GameWindow
         GL.LineWidth(10);
 
         CursorState = CursorState.Grabbed;
-
+        
         mainViewport = new Viewport()
         {
             Left = 0,
@@ -65,6 +68,8 @@ public class Program : GameWindow
             mapName = args[0];
         }
         loadModels();
+
+        stopwatch.Start();
     }
 
     private static void DebugCallback(DebugSource source, DebugType type, int id, DebugSeverity severity, int length, IntPtr message, IntPtr userParam)
@@ -118,7 +123,21 @@ public class Program : GameWindow
 
         }
 
+        enemy.Draw(mainCamera, flashlight, light, false);
+
         SwapBuffers();
+
+        double currentTime = stopwatch.Elapsed.TotalSeconds;
+        frameTimes.Add(currentTime);
+
+        while (frameTimes.Count > 0 && currentTime - frameTimes[0] > 1.0)
+        {
+            frameTimes.RemoveAt(0);
+        }
+
+        fps = frameTimes.Count;
+
+        Title = $"FPS: {fps}";
     }
 
     float timetotal  = 0;
@@ -135,7 +154,7 @@ public class Program : GameWindow
         if (KeyboardState.IsKeyDown(Keys.LeftShift)) running = 2;
         if (KeyboardState.IsKeyDown(Keys.F) && lastToggle <= 0f) { flashlight.Toggle(); lastToggle = 0.2f; }
         if (KeyboardState.IsKeyDown(Keys.F11) && lastToggle <= 0f) { WindowState = WindowState == WindowState.Fullscreen ? WindowState.Maximized : WindowState.Fullscreen; lastToggle = 0.2f; }
-        if (KeyboardState.IsKeyDown(Keys.F10) && lastToggle <= 0f) { wireModel = !wireModel; lastToggle = 0.2f; if (light.lightOverdose.X > 0f) { light.lightOverdose = new Vector3(0f); } else { light.lightOverdose = new Vector3(1f); } }
+        if (KeyboardState.IsKeyDown(Keys.F10) && lastToggle <= 0f) { lastToggle = 0.2f; if (wireModel) { light.lightOverdose = new Vector3(0f); wireModel = false; } else { light.lightOverdose = new Vector3(1f); wireModel = true; } }
         if (KeyboardState.IsKeyDown(Keys.E)) { teleport.teleport(); }
 
         if (KeyboardState.IsKeyDown(Keys.Escape)) Close();
@@ -159,15 +178,7 @@ public class Program : GameWindow
 
         flashlight.UpdatePositionAndDirection(mainCamera);
         teleport.teleportAnimation((float)args.Time);
-
-        fps++;
-        lastFPStime += (float)args.Time;
-        if (lastFPStime > 1f)
-        {
-            Title = $"FPS: {fps}";
-            fps = 0;
-            lastFPStime = 0f;
-        }
+        enemy.Animate(wallHere, (float)args.Time, mainCamera);
     }
 
     Vector2 mouseDelta;
@@ -178,6 +189,8 @@ public class Program : GameWindow
     private void loadModels()
     {
         MyObjects myObjects = new MyObjects(shader);
+
+        enemy = myObjects.getGreenGhost(new Vector3(7f, 0f, 29f));
 
         Console.WriteLine("Loading map: " + mapName);
         string[] lines = File.ReadAllLines("maps/" + mapName);
@@ -242,7 +255,7 @@ public class Program : GameWindow
                         wallHere[x, y] = true;
                         modelList.Add(myObjects.getWallPic1R(blockPos));
                         break;
-                    case 'O':
+                    case 'N':
                         modelList.Add(myObjects.getFreeSpaceTop1(blockPos));
                         modelList.Add(myObjects.getFloorTeleport(blockPos));
 

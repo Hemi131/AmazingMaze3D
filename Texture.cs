@@ -11,11 +11,9 @@ namespace AmazingMaze3D
     public class Texture
     {
         private int texID;
-        public int Unit { get; set; }
 
-        public Texture(string filename, int unit)
+        public Texture(string filename)
         {
-            Unit = unit;
             StbImage.stbi_set_flip_vertically_on_load(1);
             ImageResult image;
 
@@ -44,8 +42,6 @@ namespace AmazingMaze3D
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.LinearMipmapLinear);
             GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Linear);
 
-            GL.BindTexture(TextureTarget.Texture2D, 0);
-
             if (Program.IsExtensionSupported("GL_EXT_texture_filter_anisotropic"))
             {
                 GL.GetFloat((GetPName)All.MaxTextureMaxAnisotropyExt, out float maxAnisotropy);
@@ -59,9 +55,9 @@ namespace AmazingMaze3D
 
         public void Bind(int shaderloc)
         {
-            GL.ActiveTexture(TextureUnit.Texture0 + Unit);
+            GL.ActiveTexture(TextureUnit.Texture0);
             GL.BindTexture(TextureTarget.Texture2D, texID);
-            GL.Uniform1(shaderloc, Unit);
+            GL.Uniform1(shaderloc, 0);
         }
 
     }

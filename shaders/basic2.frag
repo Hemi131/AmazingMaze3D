@@ -74,12 +74,17 @@ void main() {
     vec3 norm = normalize(normalWorld);
     vec3 viewDir = normalize(cameraPosWorld - fragmentWorld);
 
-    vec3 texColor = texture(objTex, texCoordVS).rgb;
+    vec4 texColorA = texture(objTex, texCoordVS).rgba;
+    if (texColorA.a < 0.1) {
+        discard;
+    }
+    vec3 texColor = texColorA.rgb;
 
     vec3 ambient = calculateAmbient(texColor);
     vec3 directional = calculateDirectionalLight(norm, viewDir, texColor);
     vec3 flashlight = calculateFlashlight(norm, viewDir, texColor);
 
     vec3 finalColor = ambient + directional + flashlight + lightOverdose;
+
     outColor = vec4(finalColor, 1.0);
 }
