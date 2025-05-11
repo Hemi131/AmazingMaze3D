@@ -12,14 +12,16 @@ namespace AmazingMaze3D
         private float stateTimer = 0f;
         private Vector3 currentDirection = Vector3.UnitX;
         private readonly Random rng = new Random();
+        private float chaseCooldown = 0f; // Cooldown for chase state
 
         // Parameters
         private const float viewRange = 8f;
-        private const float viewAngleThreshold = 0.8f; // ~45 degrees
+        private const float viewAngleThreshold = 0.95f; // ~45 degrees
         private const float idleTimeMin = 2f, idleTimeMax = 5f;
         private const float wanderSpeed = 1f;
         private const float chaseSpeed = 3f;
         private const float reachThreshold = 1f;
+        private const float chaseCooldownTime = 20f; // Cooldown time for chase state
 
         Vector2 vec1;
         Vector2 vec2;
@@ -38,6 +40,7 @@ namespace AmazingMaze3D
             Vector3 enemyPos, Vector3 playerPos, Vector3 playerForward, float deltaTime, bool[,] wallHere)
         {
             stateTimer -= deltaTime;
+            chaseCooldown -= deltaTime;
             Vector3 flatEnemy = new Vector3(enemyPos.X, 0, enemyPos.Z);
             Vector3 flatPlayer = new Vector3(playerPos.X, 0, playerPos.Z);
             Vector3 toEnemy = Vector3.Normalize(flatEnemy - flatPlayer);
@@ -47,7 +50,7 @@ namespace AmazingMaze3D
             playerForward.X *= -1f;
             playerForward.Z *= -1f; // Invert direction for correct comparison
             playerForward.Normalize();
-            bool playerLookingAtEnemy = Vector3.Dot(playerForward, toEnemy) > viewAngleThreshold;
+            bool playerLookingAtEnemy = (chaseCooldown <= 0f) ? Vector3.Dot(playerForward, toEnemy) > viewAngleThreshold : false;
 
             // --- State Transitions ---
             switch (currentState)
@@ -59,14 +62,14 @@ namespace AmazingMaze3D
                         stateTimer = 2f + (float)rng.NextDouble() * 3f;
                         PickRandomDirection();
                     }
-                    else if (distance < viewRange && (playerLookingAtEnemy || rng.NextDouble() < 0.0))
+                    else if (distance < viewRange && playerLookingAtEnemy)
                     {
                         currentState = State.Chase;
                     }
                     break;
 
                 case State.Wander:
-                    if (distance < viewRange && (playerLookingAtEnemy || rng.NextDouble() < 0.0))
+                    if (distance < viewRange && playerLookingAtEnemy)
                     {
                         currentState = State.Chase;
                     }
@@ -82,6 +85,7 @@ namespace AmazingMaze3D
                     {
                         currentState = State.Wander;
                         stateTimer = 2f + (float)rng.NextDouble() * 3f;
+                        chaseCooldown = chaseCooldownTime;
                         PickRandomDirection();
                     }
                     break;
