@@ -40,14 +40,10 @@ namespace AmazingMaze3D
               new Texture("textures/Enemy2/FrontRight.png"),
               new Texture("textures/Enemy2/Left.png"),
               new Texture("textures/Enemy2/Right.png"),
-            new Texture("textures/Enemy2/BackLeft.png"),
-                    new Texture("textures/Enemy2/BackRight.png"),
-                    new Texture("textures/Enemy2/Back.png"),
-
-
-                    }));
-
-            
+              new Texture("textures/Enemy2/BackLeft.png"),
+              new Texture("textures/Enemy2/BackRight.png"),
+              new Texture("textures/Enemy2/Back.png")
+            }));
         }
 
         public Model getWall1(Vector3 position)

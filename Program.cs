@@ -62,7 +62,7 @@ public class Program : GameWindow
         flashlight = new Flashlight();
         teleport = new Teleport("t", light, mainCamera);
 
-        WindowState = WindowState.Fullscreen;
+        WindowState = WindowState.Maximized;
 
         if (args.Length > 0) {
             mapName = args[0];

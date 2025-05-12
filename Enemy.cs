@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 namespace AmazingMaze3D
 {
     /// <summary>
-    /// Jednoduchý model obsahující seznam vrcholů
+    /// Model protivníka
     /// </summary>
     public class Enemy : IDisposable
     {
