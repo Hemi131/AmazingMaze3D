@@ -114,16 +114,15 @@ public class Program : GameWindow
             {
                 model.Draw(mainCamera, flashlight, light, true);
             }
+            enemy.Draw(mainCamera, flashlight, light, true);
 
         } else {
             foreach (var model in modelList)
             {
                 model.Draw(mainCamera, flashlight, light, false);
             }
-
+            enemy.Draw(mainCamera, flashlight, light, false);
         }
-
-        enemy.Draw(mainCamera, flashlight, light, false);
 
         SwapBuffers();
 
@@ -140,7 +139,6 @@ public class Program : GameWindow
         Title = $"FPS: {fps}";
     }
 
-    float timetotal  = 0;
     protected override void OnUpdateFrame(FrameEventArgs args)
     {
         Vector2 direction = new Vector2(0, 0);

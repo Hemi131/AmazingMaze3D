@@ -36,8 +36,8 @@ namespace AmazingMaze3D
         public void teleport()
         {
             if (!finished) { return; }
-            if ((camera.pos - tp1Pos).Length < 0.33f) { nextLocation = tp2Pos; finished = false; }
-            if ((camera.pos - tp2Pos).Length < 0.33f) { nextLocation = tp1Pos; finished = false; }
+            if ((camera.pos - tp1Pos).Length < 0.4f) { nextLocation = tp2Pos; finished = false; }
+            if ((camera.pos - tp2Pos).Length < 0.4f) { nextLocation = tp1Pos; finished = false; }
         }
         public void teleportAnimation(float time)
         {
